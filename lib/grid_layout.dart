@@ -13,7 +13,8 @@ class MyGridView extends StatelessWidget{
           title: new Text('GridView'),
         ),
 //        body: buildGridExtent(),
-        body: buildGridCount(),
+//        body: buildGridCount(),
+        body: _buildCustomScrollView(),
       )
     );
   }
@@ -33,5 +34,18 @@ Widget buildGridCount() {
   return new GridView.count(crossAxisCount:3,
     mainAxisSpacing: 4,crossAxisSpacing: 8,
     children: new List.generate(20, (index)=>new Image.asset("images/timg.jpg",fit: BoxFit.cover,)),
+  );
+}
+Widget _buildCustomScrollView() {
+  return new CustomScrollView(
+    primary: false,
+    slivers: <Widget>[
+      new SliverGrid.count(
+        crossAxisSpacing: 10.0,
+        //      横轴数量 这里的横轴就是x轴 因为方向是垂直的时候 主轴是垂直的
+        crossAxisCount: 2,
+        children: new List.generate(20, (index)=>new Image.asset("images/timg.jpg",fit: BoxFit.cover,)),
+      )
+    ],
   );
 }

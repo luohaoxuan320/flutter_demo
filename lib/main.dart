@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter_app/grid_layout.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return  MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
         // This is the theme of your application.
@@ -71,7 +71,7 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: Center(
+      body: Builder(builder: (context)=>Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
         child: Column(
@@ -98,14 +98,53 @@ class _MyHomePageState extends State<MyHomePage> {
               '$_counter',
               style: Theme.of(context).textTheme.display1,
             ),
+            RaisedButton(
+              child: Text('跳到GridView'),
+              onPressed: ()=>Navigator.push(context, MaterialPageRoute(builder: (context)=>MyGridView())),
+            ),
+            RaisedButton(
+                child: Text('跳转并带参数'),
+                onPressed: ()=>Navigator.push(context, MaterialPageRoute(builder: (context)=>SecondScreen("我是传过来的参数，点我呀"))).then((result){
+                  print("返回值:$result");
+                  Scaffold.of(context).showSnackBar(SnackBar(content: Text(result)));
+                })),
           ],
         ),
       ),
+       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
         tooltip: 'Increment',
         child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),// This trailing comma makes auto-formatting nicer for build methods.
     );
   }
+}
+
+class SecondScreen extends StatelessWidget{
+  
+  final String params;
+
+
+  SecondScreen(this.params);
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return
+    //多MaterialApp这一层，将不会主动显示返回icon
+//      new MaterialApp(home:
+        new Scaffold(
+        appBar: new AppBar(
+          title: new Text('SecondPage'),
+        ),
+        body: new Center(
+          child: new RaisedButton(
+              child: new Text("$params"),
+              onPressed: ()=>Navigator.pop(context,'我是返回值')),
+        ),
+//      ),
+    );
+  }
+
 }
