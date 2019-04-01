@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/grid_layout.dart';
+import 'package:dio/dio.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -108,6 +109,27 @@ class _MyHomePageState extends State<MyHomePage> {
                   print("返回值:$result");
                   Scaffold.of(context).showSnackBar(SnackBar(content: Text(result)));
                 })),
+            RaisedButton(
+              child: Text('跳到登录页'),
+              onPressed: () => Navigator.push(context, MaterialPageRoute(
+                  builder: (context) => LoginInputText())),
+            ),
+            RaisedButton(
+              child: Text('跳到动画页'),
+              onPressed: () => Navigator.push(context, MaterialPageRoute(
+                  builder: (context) => MyAnimationPage())),
+            ),
+            RaisedButton(
+              child: Text('跳到透明显示隐藏页'),
+              onPressed: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => OpacityPager())),
+            ),
+            RaisedButton(
+              child: Text('获取天气'),
+              onPressed: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => WeatherPager())),
+
+            )
           ],
         ),
       ),
@@ -144,6 +166,263 @@ class SecondScreen extends StatelessWidget{
               onPressed: ()=>Navigator.pop(context,'我是返回值')),
         ),
 //      ),
+    );
+  }
+
+}
+
+
+///
+/// 测试输入
+///
+class LoginInputText extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    // TODO: implement createState
+    return LoginInputState();
+  }
+
+}
+
+
+class LoginInputState extends State<LoginInputText> {
+  final TextEditingController controller = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return new Scaffold(
+      appBar: new AppBar(
+        title: Text("登录"),
+      ),
+      body: Center(
+        child: new Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              width: 200,
+              child: TextField(
+                decoration: new InputDecoration(
+                  hintText: '请输入用户名',
+                ),
+                controller: controller,
+                onChanged: (newValue) => print("inputValue=$newValue"),
+              ),
+            ),
+            RaisedButton(
+              onPressed: () =>
+              {
+              showDialog(context: context, child: new AlertDialog(
+                title: Text("用户名"),
+                content: new Text(controller.text),
+              ))
+              },
+              child: Text('登录'),
+            )
+          ],
+        ),
+      ),
+    );;
+  }
+
+}
+
+
+///动画
+///
+///
+class MyAnimationPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return new Scaffold(
+        appBar: new AppBar(
+          title: Text("测试动画"),
+        ),
+        body: new MyAnimation()
+    );
+  }
+
+}
+
+///
+class MyAnimation extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    // TODO: implement createState
+    return new MyAnimationState();
+  }
+
+
+}
+
+class MyAnimationState extends State<MyAnimation>
+    with SingleTickerProviderStateMixin {
+  Animation<double> _animation;
+  AnimationController _controller;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _controller = AnimationController(
+        vsync: this,
+        duration: Duration(milliseconds: 5000)
+    );
+    _animation = Tween(
+        begin: 0.0,
+        end: 300.0
+    ).animate(_controller)
+      ..addStatusListener((state) {
+        if (state == AnimationStatus.completed) {
+          _controller.reverse();
+        }
+      });
+//      ..addListener(()=>setState((){print("animation value=${_animation.value}");}));
+    _controller.forward();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    print("build value=${_animation.value}");
+    return new AnimationBuilder(_animation);
+//    return new AnimatedLogo(_animation);
+
+    /* return  new Center(
+        child: Container(
+//          margin: const EdgeInsets.symmetric(vertical:10.0),
+          height: _animation.value,
+          width: _animation.value,
+          child:FlutterLogo(),
+//          child: Image.asset("images/timg.jpg"),
+        ),
+    );*/
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _controller.dispose();
+
+    super.dispose();
+  }
+}
+
+class AnimatedLogo extends AnimatedWidget {
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    final Animation<double> animation = listenable;
+
+    return new Center(
+      child: Container(
+//          margin: const EdgeInsets.symmetric(vertical:10.0),
+        height: animation.value,
+        width: animation.value,
+        child: FlutterLogo(),
+//          child: Image.asset("images/timg.jpg"),
+      ),
+    );
+  }
+
+  AnimatedLogo(Animation<double> animation) :super(listenable: animation);
+
+}
+
+class AnimationBuilder extends StatelessWidget {
+  Animation<double> animation;
+
+  AnimationBuilder(this.animation);
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return new Center(
+      child: new AnimatedBuilder(
+          animation: animation, builder: (BuildContext context, Widget child) {
+        return new Container(
+          height: animation.value,
+          width: animation.value,
+          child: FlutterLogo(),
+        );
+      }),
+    );
+  }
+
+}
+
+class OpacityPager extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return new Scaffold(
+      appBar: new AppBar(
+        title: new Text("透明度控制显示隐藏"),
+      ),
+      body: new OpacityApp(),
+    );
+  }
+
+}
+
+///透明度控制隐藏显示
+
+class OpacityApp extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    // TODO: implement createState
+    return new OpacityAppState();
+  }
+
+}
+
+class OpacityAppState extends State<OpacityApp> {
+  var _visible = true;
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return new Opacity(opacity: _visible ? 1.0 : 0.0,
+      child: new Center(
+        child: new RaisedButton(
+          onPressed: () {
+            setState(() {
+              _visible = !_visible;
+            });
+          },
+          child: new Text("别说话，点我"),
+        ),
+      ),
+    );
+  }
+}
+
+///获取网络请求
+
+class WeatherPager extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return new Scaffold(
+      appBar: new AppBar(
+        title: new Text("获取天气"),
+      ),
+      body: new Center(
+        child: new RaisedButton(
+            child: Text('获取天气'),
+            onPressed: () {
+              Dio().get(
+                  "https://free-api.heweather.com/s6/weather/now?parameters",
+                  queryParameters: {"location": "深圳",
+                    "key": "eaf572c8304f4eeb8ad209bf05da2872",}).then((
+                  onValue) {
+                print("$onValue");
+              }, onError: (error) {
+                print("error=$error");
+              });
+            }),
+      ),
     );
   }
 
